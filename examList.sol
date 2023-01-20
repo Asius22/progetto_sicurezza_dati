@@ -4,10 +4,11 @@ import "./studentList.sol";
 
 contract ExamList{
     constructor() {
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     address public owner;
+
     struct Exam{
         string name;
         address examId;
@@ -17,23 +18,21 @@ contract ExamList{
 
     mapping (address => Exam) exams;
 
-
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
 
      modifier onlyIfStudentExist(address matricola){
-        require (StudentList().getStudent(matricola).isExist == true);
+        StudentList s = StudentList(msg.sender);
+        require (s.getStudent(matricola).isExist == true);
         _;
     }
 
     //TODO cambiare require
-    function addExam(string memory name, address examId, uint mark, address studentId) public onlyOwner onlyIfStudentExist(studentId) returns (uint) {
+    function addExam(string memory name, address examId, uint mark, address studentId) public onlyIfStudentExist(studentId) returns (bool) {
         exams[examId] = Exam(name,examId, mark, studentId);
-        return 1;
+        return true;
     }
-
- 
 
 }

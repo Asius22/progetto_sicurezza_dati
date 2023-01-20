@@ -7,6 +7,7 @@ contract StudentList{
     }
 
     address public owner;
+
     struct Student{
         string name;
         string surname;
@@ -16,17 +17,16 @@ contract StudentList{
 
     mapping (address => Student) students;
 
-
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
 
     //TODO cambiare require
-    function addStudent(string memory name, string memory surname, address matricola) public onlyOwner returns (uint) {
+    function addStudent(string memory name, string memory surname, address matricola) public onlyOwner returns (bool) {
         require (students[matricola].isExist == false, "esiste gia uno studente con questa matricola");
         students[matricola] = Student(name, surname, matricola, true);
-        return 1;
+        return true;
     }
 
     function getStudent(address matricola) public view returns(Student memory){
