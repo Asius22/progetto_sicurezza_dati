@@ -30,8 +30,7 @@ contract ExamList is AccessControl{
     mapping (string => Exam) exams;
 
     modifier onlyProfs(){
-        //require(profs[msg.sender], "Colui che sta provando ad inserire l'esame non e' un prof");
-        hasRole(PROF_ROLE, msg.sender);
+        require(hasRole(PROF_ROLE, msg.sender),"non hai il permesso di eseguire quest'azione");
         _;
     }
 
@@ -39,20 +38,19 @@ contract ExamList is AccessControl{
         s = StudentList(a);
     }
 
-    modifier onlyIfStudentExist(string memory matricola) {
+    function onlyIfStudentExist(string memory matricola) public view {
         require (s.existStudent(matricola) == true, "lo studente non esiste");
-       _;
     }
 
-    function addExam(string memory name, string memory examId, uint mark, string memory studentId) public onlyProfs onlyIfStudentExist(studentId){
-        require (exams[examId].exist == false, "Esiste gia' un esame con questo dientificativo");
+    function addExam(string memory name, string memory examId, uint mark, string memory studentId) public onlyProfs {
+        onlyIfStudentExist(studentId);
+        require (exams[examId].exist == false, "Esiste gia' un esame con questo identificativo");
         exams[examId] = Exam(name,examId, mark, studentId, true);
     }
 
-    function getExam(string memory examId) public returns(string memory, string memory, uint ){
-        require(exams[examId].exist = true);
+    function getExam(string memory examId) public view returns(string memory, string memory, uint ){
+        require(exams[examId].exist == true);
         Exam storage e = exams[examId];
-        (string memory examName, string memory studentId, uint mark ) = (e.name, e.studentId, e.mark);
         return (e.name, e.studentId, e.mark);
     }
 
